@@ -88,10 +88,10 @@ public class SocketPipe implements Pipe {
   public SocketPipe(Socket socket1, Socket socket2) throws IOException {
     this.socket1 = checkNotNull(socket1, "Argument [socks1] may not be null");
     this.socket2 = checkNotNull(socket2, "Argument [socks1] may not be null");
-    pipe1 = new StreamPipe(socket1.getInputStream(), socket2.getOutputStream(), OUTPUT_PIPE_NAME);
+    pipe1 = makeStreamPipe(socket1.getInputStream(), socket2.getOutputStream(), OUTPUT_PIPE_NAME);
     pipe1.setAttribute(ATTR_SOURCE_SOCKET, socket1);
     pipe1.setAttribute(ATTR_DESTINATION_SOCKET, socket2);
-    pipe2 = new StreamPipe(socket2.getInputStream(), socket1.getOutputStream(), INPUT_PIPE_NAME);
+    pipe2 = makeStreamPipe(socket2.getInputStream(), socket1.getOutputStream(), INPUT_PIPE_NAME);
     pipe2.setAttribute(ATTR_SOURCE_SOCKET, socket2);
     pipe2.setAttribute(ATTR_DESTINATION_SOCKET, socket1);
 
@@ -99,6 +99,10 @@ public class SocketPipe implements Pipe {
     pipe2.addPipeListener(listener);
     pipe1.setAttribute(ATTR_PARENT_PIPE, this);
     pipe2.setAttribute(ATTR_PARENT_PIPE, this);
+  }
+
+  protected Pipe makeStreamPipe(java.io.InputStream in, java.io.OutputStream out, String name) {
+    return new StreamPipe(in, out, name);
   }
 
   @Override

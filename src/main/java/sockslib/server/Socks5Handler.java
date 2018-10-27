@@ -144,7 +144,7 @@ public class Socks5Handler implements SocksHandler {
     try {
       // Connect directly.
       if (proxy == null) {
-        socket = new Socket(remoteServerAddress, remoteServerPort);
+        socket = makeRemoteSocket(remoteServerAddress, remoteServerPort);
       } else {
         socket = new SocksSocket(proxy, remoteServerAddress, remoteServerPort);
       }
@@ -176,7 +176,7 @@ public class Socks5Handler implements SocksHandler {
       return;
     }
 
-    Pipe pipe = new SocketPipe(session.getSocket(), socket);
+    Pipe pipe = makeSocketPipe(session.getSocket(), socket);
     pipe.setName("SESSION[" + session.getId() + "]");
     pipe.setBufferSize(bufferSize);
     if(getSocksProxyServer().getPipeInitializer() != null){
@@ -194,7 +194,14 @@ public class Socks5Handler implements SocksHandler {
         logger.info("SESSION[{}] closed", session.getId());
       }
     }
+  }
 
+  protected Socket makeRemoteSocket(InetAddress address, int port) throws IOException {
+    return new Socket(address, port);
+  }
+
+  protected SocketPipe makeSocketPipe(Socket socket1, Socket socket2) throws IOException {
+    return new SocketPipe(socket1, socket2);
   }
 
   @Override
